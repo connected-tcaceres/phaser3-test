@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 5</title>
+    <title>Making your first Phaser 3 Game - Part 9</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
       body {
@@ -31,8 +31,11 @@
       };
 
       var player;
-      var platforms;
       var stars;
+      var platforms;
+      var cursors;
+      var score = 0;
+      var scoreText;
 
       var game = new Phaser.Game(config);
 
@@ -62,9 +65,7 @@
 
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
-        this.physics.add.collider(player, platforms);
 
-        // player.body.setGravityY(300);
         this.anims.create({
           key: "left",
           frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -85,6 +86,8 @@
           repeat: -1
         });
 
+        cursors = this.input.keyboard.createCursorKeys();
+
         stars = this.physics.add.group({
           key: "star",
           repeat: 11,
@@ -95,18 +98,15 @@
           child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
         });
 
+        scoreText = this.add.text(16, 16, "score: 0", { fontSize: "32px", fill: "#000" });
+
+        this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
 
         this.physics.add.overlap(player, stars, collectStar, null, this);
-
-        function collectStar(player, star) {
-          star.disableBody(true, true);
-        }
       }
 
       function update() {
-        cursors = this.input.keyboard.createCursorKeys();
-
         if (cursors.left.isDown) {
           player.setVelocityX(-160);
 
@@ -124,6 +124,13 @@
         if (cursors.up.isDown && player.body.touching.down) {
           player.setVelocityY(-330);
         }
+      }
+
+      function collectStar(player, star) {
+        star.disableBody(true, true);
+
+        score += 10;
+        scoreText.setText("Score: " + score);
       }
     </script>
   </body>
